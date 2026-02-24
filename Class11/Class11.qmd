@@ -1,0 +1,116 @@
+---
+title: "Class 11: Alpha Fold"
+author: "Kaliyah Adei-Manu (A18125684)"
+format: pdf
+---
+
+## Background 
+
+We saw last day that the main repository for biomolecular structure (the PDB database) only has ~250,000 entries.
+
+UniProtKB (the main sequence database) has over 200 million entries!
+
+
+## AlphaFold 
+
+In this hands-on session we will utilize AlphaFold to predict protein structure from sequence 
+
+Without the aid of such approaches, it can take years of expensive laboratory work to determine the structure of just one protein. With AlphaFold we can now accurately compute a typical protein structure in as little as ten minutes.
+
+
+## The EBI AlphaFold database
+
+The EBI alphafold database contains lots of computed structure models.  It is increasingly likely that the structure you are interested in is already in this database at < https://alphafold.ebi.ac.uk/
+
+There are 3 major outputs from AlphaFold 
+
+1. A model of structure in PDB format
+2. A plDDT score : that tells us how confidnet the modle is for a given residue in your protein (High values are good above 70)
+3. a **PAE score** that tells us about protein packing quality 
+
+If you can't find the matching entry for the sequence you are interested in AFDB you can run AlphaFold yourself...
+
+
+## Running AlphaFold
+
+We will use CollabFold to run our AlphaFold sequence < https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb
+
+
+Figure from AlphaFold here!
+
+
+
+
+![](AF-A0A6L8LSL6-F1.png)
+
+## Interpreting Results
+
+Custom analysis resulting models
+
+Molstar image
+
+
+![](HIVPR_23119_HIVPR_23119_UNRELAXED_RANK_002_ALPHAFOLD2_MULTIMER_V3_MODEL_1_SEED_000.PDB-HIVPR_23119_HIVPR_23119_UNRELAXED_RANK_003_ALPHAFOLD2_MULTIMER_V3_MODEL_5_SEED_000.PDB-HIVPR_23119_HIVPR_23119_UNRELAXED_RANK_005_ALPHAFOLD2_MULTIMER_V3_.png)
+
+We can read all the alphafold results into R and do more quantative analysis than just viewing the structure in Mol-Star
+
+Read all the PDB modles 
+```{r}
+library(bio3d)
+p <- read.pdb("hivpr_23119_unrelaxed_rank_001_alphafold2_multimer_v3_model_4_seed_000.pdb")
+```
+
+```{r}
+pdb_files<- list.files("hivpr_23119/", pattern = ".pdb", full.names = T)
+library(bio3d)
+
+pdbs <- pdbaln(pdb_files, fit=TRUE, exefile="msa")
+```
+
+```{r}
+library(bio3dview)
+view.pdbs(pdbs)
+```
+```{r}
+rd <- rmsd(pdbs, fit=T)
+```
+
+```{r}
+library(pheatmap)
+
+colnames(rd) <- paste0("m",1:5)
+rownames(rd) <- paste0("m",1:5)
+pheatmap(rd)
+```
+
+```{r}
+# Read a reference PDB structure
+pdb <- read.pdb("1hsg")
+```
+
+```{r}
+plotb3(pdbs$b[1,], typ="l", lwd=2, sse=pdb)
+points(pdbs$b[2,], typ="l", col="red")
+points(pdbs$b[3,], typ="l", col="blue")
+points(pdbs$b[4,], typ="l", col="darkgreen")
+points(pdbs$b[5,], typ="l", col="orange")
+abline(v=100, col="gray")
+```
+```{r}
+core <- head(core.find(pdbs))
+```
+```{r}
+core.inds <- print(core, vol=0.5)
+```
+
+
+```{r}
+xyz <- pdbfit(pdbs, core.inds, outpath="corefit_structures")
+```
+
+```{r}
+rf <- rmsf(xyz)
+
+plotb3(rf, sse=pdb)
+abline(v=100, col="gray", ylab="RMSF")
+```
