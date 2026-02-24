@@ -1,0 +1,207 @@
+---
+title: "Class 10: Structural Bioinformatics 1"
+author: "Kaliyah Adei-Manu (A18125684)"
+format: pdf
+---
+
+## PDB statistics
+
+The Protein Data Bank (PDB) is a main repository of biomolecular structures.  Let's see what it contains: 
+
+```{r}
+stats <- read.csv("~/Downloads/Data Export Summary.csv")
+head(stats)
+```
+```{r}
+stats$X.ray
+```
+
+```{r}
+sum(stats$Neutron)
+```
+
+The comma in these numbers leads to the numbers here being read as characters.
+
+```{r}
+c(100,10, "barry")
+```
+```{r}
+library(readr)
+stats <- read_csv("~/Downloads/Data Export Summary.csv")
+head(stats)
+```
+
+
+> Q1: What percentage of structures in the PDB are solved by X-Ray and Electron Microscopy.
+
+```{r}
+n.xray <- sum(stats$`X-ray`)
+#n.em <- 
+n.total <- sum(stats$Total)
+
+n.xray/n.total
+```
+```{r}
+n.em <- sum(stats$EM)
+(n.xray/n.total)+(n.em/n.total)
+```
+
+93.7892% percent of structures are solved by x-ray and EM. 
+
+> Q2: What proportion of structures in the PDB are protein?
+
+```{r}
+n.protein <- c(214078)
+n.protein/n.total
+```
+85.96889%
+
+> Q3: SKIP... 
+
+> Q4: Water molecules normally have 3 atoms. Why do we see just one atom per water molecule in this structure?
+
+One molecule is show to make it easier to see and it shows the interactions between water and the protein. 
+
+> Q5: There is a critical “conserved” water molecule in the binding site. Can you identify this water molecule? What residue number does this water molecule have
+
+residue number is 301 
+
+## Visualizing the HIV-1 protease structure
+
+> Q6: Generate and save a figure clearly showing the two distinct chains of HIV-protease along with the ligand. You might also consider showing the catalytic residues ASP 25 in each chain and the critical water (we recommend “Ball & Stick” for these side-chains). Add this figure to your Quarto document.
+
+We can use the Molecular viewer online: https://molstar.org/viewer/
+
+![My First image of HIV-Pr with surface display shoing ligand binding](1HSG.png)
+
+
+
+A new clean image showing the catalytic ASP25 amino acids in both chains of the HIV-PR dimer along with the inhibitor and the all important active site water.
+
+![](1HSG_2.png)
+
+## Bio3D package for structual bioinformatics 
+
+```{r}
+library(bio3d)
+
+pdb <- read.pdb("1hsg")
+pdb
+```
+
+> Q7: How many amino acid residues are there in this pdb object?
+
+214
+> Q8: Name one of the two non-protein residues? 
+
+MK1
+> Q9: How many protein chains are in this structure?
+
+2
+
+```{r}
+head(pdb$atom)
+```
+
+
+## Predicting fuctional motions of a single structure
+
+Read an ADK structure from the PDB database
+
+```{r}
+adk <- read.pdb("6s36")
+```
+```{r}
+adk
+```
+
+```{r}
+# Perform protein flexiblity prediction
+m <- nma(adk)
+```
+
+```{r}
+plot(m)
+```
+write out our results as a wee trajectory/movie of predicted motions: 
+```{r}
+mktrj(m, file="adk_m7.pdb")
+```
+
+
+## Comparative analysis with PCA
+
+First step find an ADK sequence:
+
+```{r}
+library(bio3d)
+id <- "1ake_A" ## Change this to run a different analysis
+aa <- get.seq( id)
+```
+```{r}
+aa
+```
+DB database for all related entries: 
+```{r}
+blast <- blast.pdb(aa)
+hits <- plot(blast)
+```
+```{r}
+head(blast$hit.tbl)
+```
+The "top hits" are in the `hits` object. Now we can download these to our computer.  Put these in a sub-folder (directory) called pdbs 
+
+```{r}
+## Download related PDB files
+files <- get.pdb(hits$pdb.id, path="pdbs", split=TRUE, gzip=TRUE)
+```
+
+These look like a hot mess
+
+![](1AKE-1E4V-1E4Y-3HPR-3X2S-4K46-4NP6-4X8H-4X8M-5EJE-6HAM-6HAP-6RZE-6S36-8BQF-8PVW-8Q2B-8RJ9-9R6U-9R71.png)
+
+Next we will use the`pdbaln()` function to align and also superpose the PDB structure.
+
+This requires a BioConductor package called "msa" that we need to install.
+First we install BiocManager.  Then we use `BiocManager::install("msa")`
+```{r}
+# Align related PDBs
+pdbs <- pdbaln(files, fit = TRUE, exefile="msa")
+```
+
+Have a look at this new "alignment object" `pdbs`
+
+```{r}
+pdbs
+```
+
+We could view these in R with **bio3dview** `view.pdbs()`function.
+
+```{r}
+# library(bio3dview) 
+# view.pdbs(pdbs, colorScheme = "residue")
+```
+
+
+## PCA
+
+We can run PCA on our `pdbs` object using the `pca()` function from **bio3d**
+
+```{r}
+pc.xray <- pca(pdbs)
+plot(pc.xray)
+```
+
+```{r}
+plot(pc.xray,1:2)
+```
+
+We can make a visualization of the major conformational difference (i.e. large scale structure change) captured by our PCA analysis with `mktrj()` function.
+
+```{r}
+pc1 <- mktrj(pc.xray, pc=1, file="pc_1.pdb")
+```
+
+Let's see in Molstar
+
+
