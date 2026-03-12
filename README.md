@@ -11,3 +11,7 @@ My class work for [BIMM 143](https://bioboot.github.io/bimm143_W26/) At UC San D
 
 - Class 06 [R Functions](class06/class06.md)
 
+- Class 07 [Machine Learning](class07/Class7_Machine_Learning.md)
+
+- Class 08 [Cancer Cell Analysis Mini Project](class08/Untitled.md)
+
