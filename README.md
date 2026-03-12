@@ -9,4 +9,5 @@ My class work for [BIMM 143](https://bioboot.github.io/bimm143_W26/) At UC San D
 
 - Class 05 [Data Visualization with ggplot](class05/class05.md)
 
--Class 06 [R Functions](class06/class06.md)
+- Class 06 [R Functions](class06/class06.md)
+
