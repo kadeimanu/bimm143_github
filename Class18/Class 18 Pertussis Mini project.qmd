@@ -1,0 +1,239 @@
+---
+title: "Class 18 Pertussis Mini Project"
+author: "Kaliyah Adei-Manu (A18125684)"
+format: pdf
+---
+
+# Background 
+Pertussis (whooping cough) is a common lung infection casued by the bacteria B. Pertussis.  It can infect anyone but is most deadly for infants (under 1 year of age)
+
+# CDC tracking data
+The CDC tracks the number of Pertussis cases: 
+
+```{r, echo=FALSE}
+cdc <-data.frame( year = c(1922L,1923L,1924L,1925L,1926L,
+                                         1927L,1928L,1929L,1930L,1931L,
+                                         1932L,1933L,1934L,1935L,1936L,1937L,
+                                         1938L,1939L,1940L,1941L,1942L,
+                                         1943L,1944L,1945L,1946L,1947L,1948L,
+                                         1949L,1950L,1951L,1952L,1953L,1954L,
+                                         1955L,1956L,1957L,1958L,1959L,
+                                         1960L,1961L,1962L,1963L,1964L,1965L,
+                                         1966L,1967L,1968L,1969L,1970L,
+                                         1971L,1972L,1973L,1974L,1975L,1976L,
+                                         1977L,1978L,1979L,1980L,1981L,
+                                         1982L,1983L,1984L,1985L,1986L,1987L,
+                                         1988L,1989L,1990L,1991L,1992L,1993L,
+                                         1994L,1995L,1996L,1997L,1998L,
+                                         1999L,2000L,2001L,2002L,2003L,2004L,
+                                         2005L,2006L,2007L,2008L,2009L,
+                                         2010L,2011L,2012L,2013L,2014L,2015L,
+                                         2016L,2017L,2018L,2019L,2020L,
+                                         2021L,2022L,2023L,2024L,2025L),
+        cases = c(107473,164191,165418,152003,
+                                         202210,181411,161799,197371,166914,
+                                         172559,215343,179135,265269,180518,
+                                         147237,214652,227319,103188,183866,
+                                         222202,191383,191890,109873,133792,
+                                         109860,156517,74715,69479,120718,
+                                         68687,45030,37129,60886,62786,
+                                         31732,28295,32148,40005,14809,11468,
+                                         17749,17135,13005,6799,7717,9718,
+                                         4810,3285,4249,3036,3287,1759,
+                                         2402,1738,1010,2177,2063,1623,1730,
+                                         1248,1895,2463,2276,3589,4195,
+                                         2823,3450,4157,4570,2719,4083,6586,
+                                         4617,5137,7796,6564,7405,7298,
+                                         7867,7580,9771,11647,25827,25616,
+                                         15632,10454,13278,16858,27550,18719,
+                                         48277,28639,32971,20762,17972,
+                                         18975,15609,18617,6124,2116,3044,7063,22538,21996)
+      )
+```
+
+```{r}
+head(cdc)
+```
+
+> Q1. I want a plot of year vs cases 
+
+```{r}
+library (ggplot2)
+
+ggplot(cdc)+
+  aes(year,cases) +
+  geom_point()+
+  geom_line()
+```
+
+> Q2. Add annotation lines for the major milestones of wP vaccination roll-out (1946) and the switch to the aP vaccine(1996). 
+
+```{r}
+ggplot(cdc)+
+  aes(year,cases) +
+  geom_point()+
+  geom_line()+
+  geom_vline(xintercept= 1946, col="blue",lty=2)+
+  geom_vline(xintercept= 1996, col="red", lty=2) +
+  geom_vline(xintercept=2020, col="gray", lty=2)
+```
+> Q3. Describe what happened after the introduction of the aP vaccine? Do you have a possible explanation for the observed trend?
+
+In 1946, when the initial vaccine for pertussis was rolled out which was the wP vaccine, we see a rapid decline in the number of cases of Pertussis reported annually suggesting the effectiveness of this vaccine in controlling the spread of this illness.  In 1996 a new vaccine was developed after criticism from the original wP vaccine and the side effects that came with the vaccine a new type of vaccine was developed the aP vaccine.  We see initially that the aP vaccine kept the number of cases down and seemed to be as effective as the wP vaccine, however than we see a rise in cases of Pertussis this could be due to better testing from development of new technology, and due to distrust in vaccines and due to less parents vaccinated their children, leading to an increase in annual cases.  Also could be due to the switch to the aP vaccine which appears to be somewhat less effective at preventing Pertussis which is currently believed that the protection from the aP vaccine wanes sooner than the wP vaccine. Also we see another drop in the year 2020 which is likely due to Covid-19 protocols mandating social distancing which lead to the decrease in Pertussis cases. 
+
+## Exploring CMI-PB data
+
+The CMI-PB project's < https://www.cmi-pb.org/ > mission is to provide the scientific community with a comprehensive, high-quality and freely accessible resource of Pertussis booster vaccination. 
+
+Basically, make available a large dataset on the immunee response to Pertussis.  They use a "booste" vaccine as a proxy for Pertussis infection.
+
+They make their data available as JSON format API.  We can read this into R with the `read_json()` function from the **jsonlite** package: 
+
+```{r}
+library(jsonlite)
+subject <- read_json("https://www.cmi-pb.org/api/v5_1/subject", simplifyVector = TRUE)
+head(subject)
+```
+
+> Q4. How many aP and wP individuals are there in this `subject` table?
+
+```{r}
+table(subject$infancy_vac)
+```
+> Q5. How many male/females are there? 
+
+```{r}
+table(subject$biological_sex)
+```
+
+> Q6. What is the breakdown of `biological_sex` and `race`? And is this representative of the US population?
+
+```{r}
+table(subject$race, subject$biological_sex)
+```
+This is not representative of the US population.  There is a large representation of White individuals and Asian individuals, with not a lot of representation from Balck individuals or American Indian/Alaska Native individuals. 
+
+We can read more tables from the CMI-PB database
+
+```{r}
+specimen <- read_json("https://www.cmi-pb.org/api/v5_1/specimen", simplifyVector = TRUE)
+ab_titer <- read_json("https://www.cmi-pb.org/api/v5_1/plasma_ab_titer",simplifyVector = TRUE)
+```
+
+```{r}
+head(specimen)
+```
+
+```{r}
+head(ab_titer)
+```
+
+To make sense of all this data we need to "join" (a.k.a "merge" or "link") all these tables together.  Only then will you know that a given Ab measurement (from the `ab_titer` table) was collected on a certain date (from the `specimen` table) from a certain wP or aP subject (from the `subject` table).
+
+We can use **dplyr** and the `*_join()` family of functions to do this. 
+
+```{r}
+library(dplyr)
+meta <- inner_join(subject, specimen)
+head(meta)
+```
+let's do one more `inner-join()` to join the `ab_titer` with all our `meta` data.  
+
+```{r}
+abdata <- inner_join(ab_titer, meta)
+head(abdata)
+```
+
+> Q6. How many diffferent Ab "isotypes" values are in this dataset? 
+
+```{r}
+table(abdata$isotype)
+```
+There are 6 types, IgE, IgG, IgG1, IgG2, IgG3, and IgG4
+
+> Q7. How many different "antigen" values are measured? 
+
+```{r}
+table(abdata$antigen)
+```
+There are 16 different antigen values measured. 
+
+> Q8.What are the different $dataset values in abdata and what do you notice about the number of rows for the most “recent” dataset?
+
+```{r}
+table(abdata$dataset)
+```
+The different dataset values are "2020_dataset", "2021_dataset", "2022_dataset", and "2023_dataset".  The most recent dataset which is 2023_dataset, have 15050 rows which is more than the previous 2021 and 2022 datasets, but less than the 2020 dataset.  
+
+
+
+Let's focus on IgG isotype
+
+```{r}
+igg <- abdata |> 
+       filter(isotype=="IgG")
+
+head(igg)
+```
+Let's make a plot of "MFI_normalized vs antigen" 
+
+```{r}
+library(ggplot2)
+
+ggplot(igg)+
+  aes(MFI_normalised,antigen)+
+  geom_boxplot()
+```
+> Q9. What antigens show differences in the level of IgG antibody titers recognizing them over time? Why these and not others?
+
+The antigens PT, FIM2/3, and FHA show the largest changes in IgG antibody titers over time. These antigens are the main components of the aP vaccine, so it makes sense that antibody levels against them increase after vaccination and then change over time as the immune response develops. Antigens that are not included in the vaccine do not show the same level of change because the immune system was not specifically boosted to recognize them. 
+
+> Q10.  Is there a difference for these responses between aP and wP individuals? 
+
+```{r}
+ggplot(igg)+
+  aes(MFI_normalised,antigen, col= infancy_vac)+
+  geom_boxplot()
+```
+
+```{r}
+ggplot(igg)+
+  aes(MFI_normalised,antigen)+
+  geom_boxplot()+
+  facet_wrap(~infancy_vac)
+```
+
+> Q11. Is there a difference with time (i.e. for booster shot vs after booster shot)?
+
+```{r}
+ggplot(igg)+
+  aes(MFI_normalised,antigen, col=infancy_vac)+
+  geom_boxplot()+
+  facet_wrap(~visit)
+```
+Another graph looking specifically at IgG PT in individuals with wP vaccinces and aP vaccines. 
+
+```{r}
+## Filter to 2021 dataset, IgG and Pt only
+abdata.21 <- abdata %>% filter(dataset == "2021_dataset", isotype=="IgG", antigen=="PT")
+
+abdata.21 %>% 
+  filter(isotype == "IgG",  antigen == "PT") %>%
+  ggplot() +
+    aes(x=planned_day_relative_to_boost,
+        y=MFI_normalised,
+        col=infancy_vac,
+        group=subject_id) +
+    geom_point() +
+    geom_line() +
+    geom_vline(xintercept=0, linetype="dashed") +
+    geom_vline(xintercept=14, linetype="dashed") +
+  geom_smooth(aes(group = infancy_vac, color = infancy_vac),method = "loess",span = 0.4,linewidth=1.5, se = FALSE,size = 1.3)+
+  labs(title="2021 dataset IgG PT",
+       subtitle = "Dashed lines indicate day 0 (pre-boost) and 14 (apparent peak levels)")
+
+
+```
+
+
+
