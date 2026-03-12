@@ -23,7 +23,7 @@ My class work for [BIMM 143](https://bioboot.github.io/bimm143_W26/) At UC San D
 
 - Class 12 [Genome informatics and high throughput sequencing](class12/class12.md)
 
-- Class 13 [Transcriptomics, RNA-Seq analysis, and the interpretation of gene lists](class13/Class13.qmd)
+- Class 13 [Transcriptomics and RNA-Seq analysis](class13/Class13.qmd)
 
 - Class 14 [RNA-Seq mini project](class14/Class14.md)
 
