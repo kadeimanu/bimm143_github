@@ -27,8 +27,8 @@ My class work for [BIMM 143](https://bioboot.github.io/bimm143_W26/) At UC San D
 
 - Class 14 [RNA-Seq mini project](class14/Class14.md)
 
-- Class 17 [Analyzing sequencing data in the cloud](class17/Class 17 lab.md)
+- Class 17 [Analyzing sequencing data in the cloud](class17/Class17_lab.md)
 
-- Class 18 [Investigating pertussis resurgence mini-project](class18/Class 18 Pertussis Mini project.md)
+- Class 18 [Investigating pertussis resurgence mini-project](class18/Class_18_Pertussis_Mini_project.md)
 
-- Class 19 [Cancer mutation analysis mini-project](Class19 12.12.43 PM/Class19.md)
+- Class 19 [Cancer mutation analysis mini-project](class19/Class19.md)
